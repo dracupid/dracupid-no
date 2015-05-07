@@ -1,3 +1,7 @@
+moveAway = (reg)-> ->
+    if reg.test @path
+        @dest = null
+
 module.exports = (kit) ->
     ###*
      * compile coffee and lint
@@ -5,16 +9,17 @@ module.exports = (kit) ->
      * @option {array | string} disable     coffeelint rule to be disabled
      * @option {boolean}        useCache    use nokit cache
     ###
-    coffee: (opts = {useCache: true}) ->
+    coffee: (opts = {}) ->
         cfg = require './coffeelint-strict.json'
         if disable = opts.disable
             disable = [disable] if not Array.isArray disable
             disable.forEach (rule) -> cfg[rule].level = 'ignore' if cfg[rule]
         drives = kit.require 'drives'
 
-        kit.warp ['src', 'lib', 'libs'].map (n) -> "#{n}/**/*.coffee"
-        .load drives.reader isCache: opts.useCache
+        kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.coffee"
+        .load drives.reader isCache: !! opts.useCache
         .load drives.coffeelint config: cfg
+        .load moveAway /(test|benchmark)\//
         .load drives.coffee()
         .run 'dist'
         .catch -> return

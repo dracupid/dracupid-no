@@ -19,10 +19,14 @@ module.exports = (kit) ->
         kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.coffee"
         .load drives.reader isCache: !! opts.useCache
         .load drives.coffeelint config: cfg
-        .load moveAway /(test|benchmark)\//
         .load drives.coffee()
+        .load moveAway /(test|benchmark)\//
         .run 'dist'
-        .catch -> return
+        .catch (e)->
+            if e.line? and e.rule
+                kit.Promise.resolve()
+            else
+                kit.Promise.reject e
 
     ###*
      * test using mocha

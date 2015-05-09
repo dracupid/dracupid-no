@@ -1,8 +1,13 @@
-moveAway = (reg)-> ->
+
+module.exports = (kit) ->
+    nil = -> ->
+    moveAway = (reg)-> ->
     if reg.test @path
         @dest = null
 
-module.exports = (kit) ->
+    compress = -> ->
+        @content = @content.replace /###[^#]*###|#.*|\n\n/g, ''
+
     ###*
      * compile coffee and lint
      * @param  {Object}         opts        options
@@ -10,14 +15,19 @@ module.exports = (kit) ->
      * @option {boolean}        useCache    use nokit cache
     ###
     coffee: (opts = {}) ->
+        kit._.defaults opts,
+            compress: true
+            useCache: false
+            disable: null
         cfg = require './coffeelint-strict.json'
         if disable = opts.disable
-            disable = [disable] if not Array.isArray disable
+            disable = [disable] unless Array.isArray disable
             disable.forEach (rule) -> cfg[rule].level = 'ignore' if cfg[rule]
         drives = kit.require 'drives'
 
         kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.coffee"
-        .load drives.reader isCache: !! opts.useCache
+        .load drives.reader isCache: opts.useCache
+        .load if opts.compress then compress() else nil()
         .load drives.coffeelint config: cfg
         .load drives.coffee()
         .load moveAway /(test|benchmark)\//

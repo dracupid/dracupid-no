@@ -1,12 +1,15 @@
 
 module.exports = (kit) ->
     nil = -> ->
-    moveAway = (reg)-> ->
-    if reg.test @path
-        @dest = null
+    moveAway = (reg) -> ->
+        @dest = null if reg.test @path
 
     compress = -> ->
-        @content = @content.replace /###[^#]*###|#.*|\n\n/g, ''
+        @contents = @contents.split('\n').filter (line) ->
+            line = line.trim()
+            line and not (line[0] in ['/', '*'])
+        .join '\n'
+        @contents += '\n'
 
     ###*
      * compile coffee and lint
@@ -27,10 +30,10 @@ module.exports = (kit) ->
 
         kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.coffee"
         .load drives.reader isCache: opts.useCache
-        .load if opts.compress then compress() else nil()
         .load drives.coffeelint config: cfg
         .load drives.coffee()
         .load moveAway /(test|benchmark)\//
+        .load if opts.compress then compress() else nil()
         .run 'dist'
         .catch (e)->
             if e.line? and e.rule

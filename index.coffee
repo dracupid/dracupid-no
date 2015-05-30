@@ -29,10 +29,10 @@ module.exports = (kit) ->
             disable.forEach (rule) -> cfg[rule].level = 'ignore' if cfg[rule]
         drives = kit.require 'drives'
 
-        kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.coffee"
+        kit.warp ['src', 'lib', 'libs', 'test', 'benchmark'].map (n) -> "#{n}/**/*.*"
         .load drives.reader isCache: opts.useCache
-        .load drives.coffeelint config: cfg
-        .load drives.coffee()
+        .load drives.auto 'lint', '.coffee': config: cfg
+        .load drives.auto 'compile'
         .load moveAway /(test|benchmark)\//
         .load if opts.compress then compress() else nil()
         .run 'dist'

@@ -6,7 +6,7 @@ module.exports = (kit) ->
         @dest = null if reg.test @path
 
     compress = -> ->
-        return if @dest.ext isnt '.js'
+        return if not @dest or @dest.ext isnt '.js'
         @contents = @contents.split('\n').filter (line) ->
             line = line.trim()
             line and not (line[0] in ['/', '*'])

@@ -33,6 +33,9 @@
     "ensure_comprehensions": {
         "level": "warn"
     },
+    "eol_last": {
+        "level": "error"
+    },
     "indentation": {
         "value": 4,
         "level": "error"
@@ -84,6 +87,9 @@
         "level": "ignore"
     },
     "no_tabs": {
+        "level": "error"
+    },
+    "no_this": {
         "level": "error"
     },
     "no_throwing_strings": {

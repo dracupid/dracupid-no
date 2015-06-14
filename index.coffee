@@ -38,7 +38,7 @@ module.exports = (kit) ->
         .load if opts.compress then compress() else nil()
         .run 'dist'
         .catch (e)->
-            if e.line? and e.rule
+            if e.level and e.rule
                 kit.Promise.resolve()
             else
                 kit.Promise.reject e

@@ -3,7 +3,10 @@
 module.exports = (kit) ->
     nil = -> ->
     moveAway = (reg) -> ->
-        @dest = null if reg.test @path
+        if typeof reg is 'string'
+            @dest = null if @path.indexOf(reg) >= 0
+        else
+            @dest = null if reg.test @path
 
     compress = -> ->
         return if not @dest or @dest.ext isnt '.js'
@@ -35,6 +38,7 @@ module.exports = (kit) ->
         .load drives.auto 'lint', '.coffee': config: cfg
         .load drives.auto 'compile'
         .load moveAway /(test|benchmark)\//
+        .load moveAway /Readme.tpl/i
         .load if opts.compress then compress() else nil()
         .run 'dist'
         .catch (e)->
